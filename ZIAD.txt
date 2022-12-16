@@ -1,0 +1,113 @@
+%(A Mode Versuch)
+
+clear all
+clc
+signal = load('signal_21.dat'); % Das Signal einlesen
+t = signal(:,1);             
+u = signal(:,2);            
+figure 
+plot(t,u)
+xlabel('Die Zeit in [µs]');
+ylabel('Die Spannung in [V]');
+title('Das Signal');
+grid on
+                     
+t1= find(t < 0.1);                        
+u_mittelwert = mean(u(t1));              
+u = u-u_mittelwert;
+
+Schallgeschwindigkeit_im_Wasser_C = 1484;  %in m/s 
+
+Signalslaenge = length(t)            
+
+Huellkurve = abs(hilbert(u));             
+
+Signal_maximum = max(Huellkurve);
+LdB6  = Signal_maximum/2;      
+LdB20 = Signal_maximum/10;     
+grenze6  = find (Huellkurve >= LdB6);
+grenze20 = find (Huellkurve >= LdB20); 
+
+T6pulsdauer  = t(grenze6(end))-t(grenze6(1)) ; 
+T20pulsdauer = t(grenze20(end))-t(grenze20(1)); 
+
+% die Pulslänge
+
+PulsLaenge6dB  = Schallgeschwindigkeit_im_wasser_C * T6pulsdauer  
+PulsLaenge20dB = Schallgeschwindigkeit_im_wasser_C * T20pulsdauer
+
+figure ('name','Bestimmung der Pulslaenge') 
+
+plot (t,u)                         
+hold on
+plot (t,Huellkurve,'k')
+grid on
+plot([t(grenze6(1)), t(grenze6(end))], [LdB6  LdB6] ,'g')
+plot([t(grenze20(1)),t(grenze20(end))],[LdB20 LdB20],'r')
+
+xlabel('Die Zeit in [µs]');
+ylabel('Spannung in [V]');
+title('Das signal mit der Huellkurve');
+
+
+
+%( Bestimmung der Bandbreite)%
+
+signal= load('signal_21.dat');
+t = signal(:,1);             
+u= signal(:,2);             
+
+%  glaetten des Spektrums %
+
+Ls = length(signal);
+L= zeros(ls,1)+u ; 
+Li= (L-mean(L));
+FFTEcho = fft(Li); 
+
+betragFFTEcho= abs(FFTEcho);
+
+betragFFTEcho = betragFFTEcho / max(betragFFTEcho);
+
+DeltaT = t(2)-t(1); 
+
+Abtastfrequenz = 1/(Ls * DeltaT);
+
+intervallab = [0:Ls] * Abtastfrequenz; %Frequenzsintervall des abgetasteten Signals 
+
+Gl= find (intervallab <= 40e6 );
+
+FFTGL= betragFFTEcho(1:G(end));
+
+FTTmaximum = max(FFTGL);
+
+K= intervallab(1:GL(end));
+
+Mittenfrequenz = K(find(FFTGL == FTTmaximum)) 
+
+L6  = FTTmaximum/2;   
+L20 = FTTmaximum/10;   
+
+Grenze6  = find (FFTGl >= L6);
+Grenze20 = find (FFTGl>= L20);
+
+t6dB  = linspace (0,40e6, 300);         
+t20dB = linspace (0,40e6, 300);
+
+Bandbreite6  = K(Grenze6(end)) - K(Grenze6(1))
+Bandbreite20 = K(Grenze20(end))- K(Grenze20(1))
+
+relativen_Bandbreiten6  = Bandbreite6 /Mittenfrequenz 
+relativen_Bandbreiten20 = Bandbreite20/Mittenfrequenz
+
+figure ('name','Bandbreite')
+plot (K,FFTGl)
+hold on
+grid on
+plot (t6dB,L6,'.g')
+plot (t20dB,L20,'.r')
+
+xlabel('Frequenzen (0 bis 40) MHz')
+ylabel('Spannung[V]')
+title('Bandbreite')
+legend('Betrag von FFT')
+hold off
